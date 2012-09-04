@@ -55,13 +55,7 @@
 
 @implementation SVSegmentedControl
 
-@synthesize selectedSegmentChangedHandler, changeHandler, selectedIndex, animateToInitialSelection, accessibilityElements;
-@synthesize cornerRadius, tintColor, backgroundImage, font, textColor, textShadowColor, textShadowOffset, segmentPadding, titleEdgeInsets, height, crossFadeLabelsOnDrag;
-@synthesize titlesArray, thumb, thumbRects, snapToIndex, trackingThumb, moved, activated, halfSize, dragOffset, segmentWidth, thumbHeight;
-
-// deprecated
-@synthesize delegate, thumbEdgeInset, shadowColor, shadowOffset;
-
+@synthesize thumb = _thumb;
 #pragma mark -
 #pragma mark Life Cycle
 
@@ -98,10 +92,10 @@
 
 - (SVSegmentedThumb *)thumb {
     
-    if(thumb == nil)
-        thumb = [[SVSegmentedThumb alloc] initWithFrame:CGRectZero];
+    if(_thumb == nil)
+        _thumb = [[SVSegmentedThumb alloc] initWithFrame:CGRectZero];
     
-    return thumb;
+    return _thumb;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
@@ -142,7 +136,7 @@
     if(self.selectedIndex == 0)
         animateInitial = NO;
 	
-    [self moveThumbToIndex:selectedIndex animate:animateInitial];
+    [self moveThumbToIndex:self.selectedIndex animate:animateInitial];
 }
 
 #pragma mark - Drawing code
@@ -200,7 +194,7 @@
 	for(NSString *titleString in self.titlesArray) {
         CGRect labelRect = CGRectMake((self.segmentWidth*i), posY, self.segmentWidth, self.font.pointSize);
         //CGContextFillRect(context, labelRect);
-		[titleString drawInRect:labelRect withFont:self.font lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
+		[titleString drawInRect:labelRect withFont:self.font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
 		i++;
 	}
 }
@@ -406,18 +400,6 @@
 	self.trackingThumb = self.moved = NO;
 	
 	self.thumb.label.text = [self.titlesArray objectAtIndex:self.selectedIndex];
-    
-    void (^oldChangeHandler)(id sender) = [self valueForKey:@"selectedSegmentChangedHandler"];
-    	
-	if(oldChangeHandler)
-		oldChangeHandler(self);
-    
-    if([self valueForKey:@"delegate"]) {
-        id controlDelegate = [self valueForKey:@"delegate"];
-        
-        if([controlDelegate respondsToSelector:@selector(segmentedControl:didSelectIndex:)])
-            [controlDelegate segmentedControl:self didSelectIndex:selectedIndex];
-    }
 
 	[UIView animateWithDuration:0.1 
 						  delay:0 
@@ -475,12 +457,12 @@
 
 - (void)setBackgroundImage:(UIImage *)newImage {
     
-    if(backgroundImage)
-        backgroundImage = nil;
+    if(_backgroundImage)
+        _backgroundImage = nil;
     
     if(newImage) {
-        backgroundImage = newImage;
-        self.height = backgroundImage.size.height;
+        _backgroundImage = newImage;
+        self.height = _backgroundImage.size.height;
     }
 }
 

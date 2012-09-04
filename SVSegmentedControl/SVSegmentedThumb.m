@@ -14,9 +14,9 @@
 
 @interface SVSegmentedThumb ()
 
-@property (nonatomic, readwrite) BOOL selected;
-@property (nonatomic, unsafe_unretained) SVSegmentedControl *segmentedControl;
-@property (nonatomic, unsafe_unretained) UIFont *font;
+@property (nonatomic) BOOL selected;
+@property (nonatomic, weak) SVSegmentedControl *segmentedControl;
+@property (nonatomic, weak) UIFont *font;
 
 @property (strong, nonatomic, readonly) UILabel *label;
 @property (strong, nonatomic, readonly) UILabel *secondLabel;
@@ -28,14 +28,7 @@
 
 
 @implementation SVSegmentedThumb
-
-@synthesize segmentedControl, backgroundImage, highlightedBackgroundImage, font, tintColor, textColor, textShadowColor, textShadowOffset, shouldCastShadow, selected;
-@synthesize label, secondLabel;
-
-// deprecated properties
-@synthesize shadowColor, shadowOffset, castsShadow;
-
-
+@synthesize label = _label, secondLabel = _secondLabel;
 
 - (id)initWithFrame:(CGRect)frame {
     
@@ -56,28 +49,28 @@
 
 - (UILabel*)label {
     
-    if(label == nil) {
-        label = [[UILabel alloc] initWithFrame:self.bounds];
-		label.textAlignment = UITextAlignmentCenter;
-		label.font = self.font;
-		label.backgroundColor = [UIColor clearColor];
-		[self addSubview:label];
+    if(_label == nil) {
+        _label = [[UILabel alloc] initWithFrame:self.bounds];
+		_label.textAlignment = NSTextAlignmentCenter;
+		_label.font = self.font;
+		_label.backgroundColor = [UIColor clearColor];
+		[self addSubview:_label];
     }
     
-    return label;
+    return _label;
 }
 
 - (UILabel*)secondLabel {
     
-    if(secondLabel == nil) {
-		secondLabel = [[UILabel alloc] initWithFrame:self.bounds];
-		secondLabel.textAlignment = UITextAlignmentCenter;
-		secondLabel.font = self.font;
-		secondLabel.backgroundColor = [UIColor clearColor];
-		[self addSubview:secondLabel];
+    if(_secondLabel == nil) {
+		_secondLabel = [[UILabel alloc] initWithFrame:self.bounds];
+		_secondLabel.textAlignment = NSTextAlignmentCenter;
+		_secondLabel.font = self.font;
+		_secondLabel.backgroundColor = [UIColor clearColor];
+		[self addSubview:_secondLabel];
     }
     
-    return secondLabel;
+    return _secondLabel;
 }
 
 - (UIFont *)font {
@@ -151,11 +144,11 @@
 
 - (void)setBackgroundImage:(UIImage *)newImage {
     
-    if(backgroundImage)
-        backgroundImage = nil;
+    if(_backgroundImage)
+        _backgroundImage = nil;
     
     if(newImage) {
-        backgroundImage = newImage;
+        _backgroundImage = newImage;
         self.shouldCastShadow = NO;
     } else {
         self.shouldCastShadow = YES;
@@ -164,11 +157,11 @@
 
 - (void)setTintColor:(UIColor *)newColor {
     
-    if(tintColor)
-        tintColor = nil;
+    if(_tintColor)
+        _tintColor = nil;
 	
 	if(newColor)
-		tintColor = newColor;
+		_tintColor = newColor;
 
 	[self setNeedsDisplay];
 }
@@ -178,10 +171,12 @@
 }
 
 - (void)setTextColor:(UIColor *)newColor {
+    _textColor = newColor;
 	self.label.textColor = self.secondLabel.textColor = newColor;
 }
 
 - (void)setTextShadowColor:(UIColor *)newColor {
+    _textShadowColor = newColor;
 	self.label.shadowColor = self.secondLabel.shadowColor = newColor;
 }
 
@@ -217,9 +212,9 @@
 
 - (void)setSelected:(BOOL)s {
 	
-	selected = s;
+	_selected = s;
 	
-	if(selected && !self.segmentedControl.crossFadeLabelsOnDrag && !self.highlightedBackgroundImage)
+	if(_selected && !self.segmentedControl.crossFadeLabelsOnDrag && !self.highlightedBackgroundImage)
 		self.alpha = 0.8;
 	else
 		self.alpha = 1;
@@ -239,20 +234,6 @@
     
     if(!self.segmentedControl.crossFadeLabelsOnDrag)
         self.label.alpha = 0;
-}
-
-#pragma mark - Support for deprecated methods
-
-- (void)setShadowOffset:(CGSize)newOffset {
-    self.textShadowOffset = newOffset;
-}
-
-- (void)setShadowColor:(UIColor *)newColor {
-    self.textShadowColor = newColor;
-}
-
-- (void)setCastsShadow:(BOOL)b {
-    self.shouldCastShadow = b;
 }
 
 @end
